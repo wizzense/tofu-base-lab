@@ -8,9 +8,9 @@ terraform {
 }
 
 provider "hyperv" {
-  user            = "admin"
+  user            = "administrator"
   password        = ""
-  host            = "192.168.87.82"
+  host            = "192.168.1.121"
   port            = 5986
   https           = true
   insecure        = true # This skips SSL validation
