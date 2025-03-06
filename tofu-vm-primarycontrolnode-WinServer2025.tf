@@ -82,7 +82,7 @@ resource "hyperv_machine_instance" "PrimaryControlNode-Server2025" {
     controller_number   = "0"
     controller_location = "1"
     //path = ""
-    path               = "E:\\Data\\en-us_windows_server_2025_preview_x64_dvd_ce9eb1a5.iso"
+    path               = "B:\\share\\isos\\2_auto_unattend_en-us_windows_server_2025_updated_feb_2025_x64_dvd_3733c10e.iso"
   }
 
   # Create a hard disk drive on the primary SCSI controller
