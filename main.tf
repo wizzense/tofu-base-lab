@@ -27,6 +27,25 @@ provider "hyperv" {
 }
 
 ###############################################################################
+# Optionally store host/user/password as variables if you want to reference
+# them in the shutdown script. Adjust defaults/values as needed.
+###############################################################################
+variable "hyperv_host_name" {
+  type    = string
+  default = "192.168.1.121"
+}
+
+variable "hyperv_user" {
+  type    = string
+  default = "ad\\administrator"
+}
+
+variable "hyperv_password" {
+  type    = string
+  default = ""
+}
+
+###############################################################################
 # Number of VMs to create
 ###############################################################################
 variable "number_of_vms" {
@@ -42,34 +61,27 @@ variable "number_of_vms" {
 #   name = "Lan"
 # }
 #
-# If not, create or reference the existing one.
 ###############################################################################
 
-
 ###############################################################################
-# hyperv_vhd: Create multiple VHD objects with distinct paths
+# hyperv_vhd: Create multiple VHD objects (one per VM) with distinct paths
 ###############################################################################
 resource "hyperv_vhd" "control_node_vhd" {
   count = var.number_of_vms
 
-  # Switch reference from your snippet
   depends_on = [hyperv_network_switch.Lan]
 
   # Unique path for each VHD (e.g. ...-0.vhdx, ...-1.vhdx, etc.)
   path = "B:\\hyper-v\\PrimaryControlNode\\PrimaryControlNode-Server2025-${count.index}.vhdx"
-  size = 60737421312 # keep your size; must be divisible by 4096
+  size = 60737421312
 }
 
 ###############################################################################
-# hyperv_machine_instance: Create multiple VMs, each with:
-#  - unique name
-#  - memory, CPU, etc. from your snippet
-#  - referencing the correct VHD by index
+# hyperv_machine_instance: Create multiple VMs
 ###############################################################################
 resource "hyperv_machine_instance" "control_node_vm" {
   count = var.number_of_vms
 
-  # Append the index for unique VM names
   name                                    = "PrimaryControlNode-Server2025-${count.index}"
   generation                              = 2
   memory_startup_bytes                    = 2147483648 # 2 GB
@@ -90,13 +102,11 @@ resource "hyperv_machine_instance" "control_node_vm" {
   dynamic_memory                          = true
   state                                   = "Running"
 
-  # Configure firmware
   vm_firmware {
     enable_secure_boot              = "Off"
     preferred_network_boot_protocol = "IPv4"
     console_mode                    = "None"
     pause_after_boot_failure        = "Off"
-
     boot_order {
       boot_type           = "DvdDrive"
       controller_number   = 0
@@ -104,7 +114,6 @@ resource "hyperv_machine_instance" "control_node_vm" {
     }
   }
 
-  # Configure processor
   vm_processor {
     compatibility_for_migration_enabled               = false
     compatibility_for_older_operating_systems_enabled = false
@@ -118,7 +127,6 @@ resource "hyperv_machine_instance" "control_node_vm" {
     expose_virtualization_extensions                  = false
   }
 
-  # Integration services
   integration_services = {
     "Guest Service Interface" = false
     "Heartbeat"               = true
@@ -128,7 +136,6 @@ resource "hyperv_machine_instance" "control_node_vm" {
     "VSS"                     = true
   }
 
-  # Network adapter
   network_adaptors {
     name                = "wan"
     switch_name         = hyperv_network_switch.Lan.name
@@ -137,14 +144,12 @@ resource "hyperv_machine_instance" "control_node_vm" {
     dynamic_mac_address = true
   }
 
-  # DVD drive
   dvd_drives {
     controller_number   = "0"
     controller_location = "1"
     path                = "B:\\share\\isos\\2_auto_unattend_en-us_windows_server_2025_updated_feb_2025_x64_dvd_3733c10e.iso"
   }
 
-  # Hard disk drive referencing the correct VHD
   hard_disk_drives {
     controller_type                 = "Scsi"
     controller_number               = 0
@@ -156,5 +161,31 @@ resource "hyperv_machine_instance" "control_node_vm" {
     minimum_iops                    = 0
     qos_policy_id                   = "00000000-0000-0000-0000-000000000000"
     override_cache_attributes       = "Default"
+  }
+}
+
+###############################################################################
+# Null resource to force shutdown VMs on destroy
+# Note: We also use 'count = var.number_of_vms' so each VM has its own null resource.
+###############################################################################
+resource "null_resource" "force_shutdown_vm_on_destroy" {
+  # Create a shutdown helper for each VM instance
+  count = var.number_of_vms
+
+  triggers = {
+    vm_name  = hyperv_machine_instance.control_node_vm[count.index].name
+    host     = var.hyperv_host_name
+    user     = var.hyperv_user
+    password = var.hyperv_password
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<EOT
+      curl -k -u "${self.triggers.user}:${self.triggers.password}" \
+      -H "Content-Type: application/json" \
+      -d '{"PowerShell":"Stop-VM -Name ${self.triggers.vm_name} -TurnOff -Force; while((Get-VM -Name ${self.triggers.vm_name}).State -ne \\"Off\\") { Start-Sleep -s 2 }}"}' \
+      https://${self.triggers.host}:5986/wsman
+    EOT
   }
 }
