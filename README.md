@@ -12,3 +12,11 @@ git clean -fd
 git pull 
 
 tofu init
+
+tofu validate
+
+tofu plan 
+
+tofu apply
+
+tofu destory
