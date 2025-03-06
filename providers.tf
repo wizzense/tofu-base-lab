@@ -1,7 +1,7 @@
 provider "hyperv" {
-  user            = "ad\\administrator"
-  password        = ""
-  host            = "192.168.1.121"
+  user            = var.hyperv_user
+  password        = var.hyperv_password
+  host            = var.hyperv_host_name
   port            = 5986
   https           = true
   insecure        = true  # This skips SSL validation
