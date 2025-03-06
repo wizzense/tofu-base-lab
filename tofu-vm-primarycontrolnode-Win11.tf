@@ -2,7 +2,7 @@
 resource "hyperv_vhd" "PrimaryControlNode-vhd" {
   depends_on = [hyperv_network_switch.Lan]
 
-  path = "B:\hyper-v\\PrimaryControlNode\\PrimaryControlNode.vhdx"
+  path = "B:\\hyper-v\\PrimaryControlNode\\PrimaryControlNode.vhdx"
   size = 60737421312 # Size in bytes, make sure this is divisible by 4096
 }
 
