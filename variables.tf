@@ -16,3 +16,11 @@ variable "hyperv_password" {
   type    = string
   default = ""
 }
+
+###############################################################################
+# Number of VMs to create
+###############################################################################
+variable "number_of_vms" {
+  type    = number
+  default = 3
+}
