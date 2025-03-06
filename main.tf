@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "hyperv" {
-  user            = "administrator"
+  user            = "ad\\administrator"
   password        = ""
   host            = "192.168.1.121"
   port            = 5986
