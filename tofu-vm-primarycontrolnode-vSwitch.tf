@@ -3,5 +3,4 @@ resource "hyperv_network_switch" "Lan" {
   name                = "DMZ"
   allow_management_os = true
   switch_type         = "Internal"
-  net_adapter_names   = ["Ethernet"]
 }
