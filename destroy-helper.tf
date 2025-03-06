@@ -1,4 +1,4 @@
-resource "null_resource" "force_shutdown_vm_on_destory" {
+resource "null_resource" "force_shutdown_vm_on_destroy" {
   triggers = {
     vm_names = hyperv_machine_instance.default.name
     host     = var.hyperv_host_name
