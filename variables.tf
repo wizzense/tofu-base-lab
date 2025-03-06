@@ -9,7 +9,7 @@ variable "hyperv_host_name" {
 
 variable "hyperv_user" {
   type    = string
-  default = "ad\\\\administrator"
+  default = "ad\\administrator"
 }
 
 variable "hyperv_password" {
