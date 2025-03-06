@@ -17,6 +17,8 @@ tofu validate
 
 tofu plan 
 
-tofu apply
+tofu apply (-auto-approve)
 
-tofu destory
+tofu destroy (-auto-approve)
+
+tofu output -json > tofu-outputs.json
