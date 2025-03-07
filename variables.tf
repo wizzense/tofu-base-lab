@@ -19,7 +19,7 @@ variable "hyperv_password" {
 
 variable "iso_path" {
     type  = string
-    default = "\\B:\\share\\isos\\3_booststrap_auto_unattend_en-us_windows_server_2025_updated_feb_2025_x64_dvd_3733c10e.iso"
+    default = "\\B:\\share\\isos\\CustomWinISO.iso"
 }
 
 ###############################################################################
