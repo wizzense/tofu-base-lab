@@ -2,8 +2,8 @@
 # We assume you already have a hyperv_network_switch resource named "Lan"
 # declared elsewhere, like:
 #
-# resource "hyperv_network_switch" "Lan" {
-#   name = "Lan"
+# resource "hyperv_network_switch" "switch1" {
+#   name = "switch1"
 # }
 #
 ###############################################################################

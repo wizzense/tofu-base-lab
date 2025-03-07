@@ -7,7 +7,7 @@ resource "hyperv_network_switch" "switch1" {
   net_adapter_names   = ["Ethernet"]
 
   lifecycle {
-    prevent_destory = true
+    prevent_destroy = true
 }
 
 }
