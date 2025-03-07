@@ -5,6 +5,7 @@ resource "hyperv_network_switch" "switch1" {
   allow_management_os = true
   switch_type         = "External"
   net_adapter_names   = ["Ethernet"]
+  minimum_bandwidth_mode = "Absolute"
 
   lifecycle {
     prevent_destroy = true
