@@ -92,7 +92,7 @@ resource "hyperv_machine_instance" "control_node_vm" {
   dvd_drives {
     controller_number   = "0"
     controller_location = "1"
-    path                = "B:\\share\\isos\\2_auto_unattend_en-us_windows_server_2025_updated_feb_2025_x64_dvd_3733c10e.iso"
+    path                = var.iso_path
   }
 
   hard_disk_drives {
