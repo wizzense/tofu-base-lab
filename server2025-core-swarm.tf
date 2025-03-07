@@ -14,7 +14,7 @@
 resource "hyperv_vhd" "control_node_vhd" {
   count = var.number_of_vms
 
-  depends_on = [hyperv_network_switch.Lan]
+  depends_on = [hyperv_network_switch.switch1]
 
   # Unique path for each VHD (e.g. ...-0.vhdx, ...-1.vhdx, etc.)
   path = "B:\\hyper-v\\PrimaryControlNode\\PrimaryControlNode-Server2025-${count.index}.vhdx"
@@ -83,7 +83,7 @@ resource "hyperv_machine_instance" "control_node_vm" {
 
   network_adaptors {
     name                = "wan"
-    switch_name         = hyperv_network_switch.Lan.name
+    switch_name         = hyperv_network_switch.switch1.name
     management_os       = false
     is_legacy           = false
     dynamic_mac_address = true
